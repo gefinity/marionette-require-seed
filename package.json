@@ -11,6 +11,7 @@
     "grunt-contrib-requirejs": "~0.4.3",
     "grunt-contrib-watch": "^0.6.1",
     "grunt-open": "^0.2.3",
-    "grunt-express": "~1.4.1"
+    "grunt-express": "~1.4.1",
+    "grunt-preprocess": "~4.0.0"
   }
 }

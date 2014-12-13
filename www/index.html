@@ -19,9 +19,19 @@
     </head>
 
     <body>
-    
-        <script src="js/env.js"></script>
+        
+        <!-- @if ENV='production' -->
+        <!-- @exclude -->
+        <script>
+            var require = {
+                baseUrl: "js/src",
+                urlArgs: "cacheBust="  + new Date().getTime(),
+            }
+        </script>
         <script src="bower_components/requirejs/require.js" data-main="requireConfig"></script>
+        <!-- @endexclude -->
+        <!-- @include prod-env.html -->
+        <!-- @endif -->
 
     </body>
 

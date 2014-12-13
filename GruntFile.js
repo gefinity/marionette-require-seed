@@ -7,17 +7,13 @@ module.exports = function(grunt) {
 
     grunt.initConfig({
 
-        project: {
-            root: __dirname.split("/").pop()
-        },
-
         sass: {
             dev: {
                 options: {
                     style: "expanded"
                 },
                 files: {
-                    "app/css/style.css": "app/css/style.scss"
+                    "www/css/style.css": "www/css/style.scss"
                 }
             },
             dist: {
@@ -25,86 +21,116 @@ module.exports = function(grunt) {
                     style: "compressed"
                 },
                 files: {
-                    "app/css/style.css": "app/css/style.scss"
+                    "dist/css/style.css": "www/css/style.scss"
                 }
             }
         },
 
         requirejs: {
-            compile: {
+            all: {
                 options: {
                     logLevel: 0,
-                    baseUrl: "app/js/src",
-                    mainConfigFile: "app/js/src/requireConfig.js",
+                    baseUrl: "www/js/src",
+                    mainConfigFile: "www/js/src/requireConfig.js",
                     name: "requireConfig",
-                    out: "app/js/bin/app-compiled.js",
+                    out: "dist/js/src/app-compiled.js",
                     optimize: "uglify2",
                     generateSourceMaps: true,
                     preserveLicenseComments: false, // does not work with generateSourceMaps
-                    // exclude example:
-                    // paths: {
-                    //     "backbone.marionette": "empty:"
-                    // }
+                    paths: {
+                        // exclude example:
+                        //"backbone.marionette": "empty:"
+                        requireLib: "../../bower_components/requirejs/require"
+                    },
+                    include: ["requireLib"]
                 }
             }
         },
 
         express: {
-            all: {
+            options: {
+                port: 4000
+            },
+            dev: {
                 options: {
-                    port: 4000,
-                    bases: [require("path").normalize("app")],
+                    bases: [require("path").normalize("www")],
                     livereload: true
+                }
+            },
+            prod: {
+                options: {
+                    bases: [require("path").normalize("dist")],
+                    livereload: false
                 }
             }
         },
 
         watch: {
             index: {
-                files: ["app/index.html"],
+                files: ["www/index.html"],
                 options: {
                     livereload: true
                 }
             },
             js: {
-                files:  [ "app/js/src/**/*.js" ],
+                files:  [ "www/js/src/**/*.js" ],
                 options: {
                     livereload: true
                 }
             },
             sass: {
-                files:  [ "app/css/**/*.scss" ],
+                files:  [ "www/css/**/*.scss" ],
                 tasks:  [ "sass:dev" ],
                 options: {
                     livereload: true
+                }
+            },
+            dist: {
+                files: [],
+                options: {
+                    livereload: false
                 }
             }
         },
 
         open: {
             all: {
-                path: "http://localhost:<%= express.all.options.port %>"
+                path: "http://localhost:<%= express.options.port %>"
             }
         },
+
+        preprocess : {
+            dist : {
+                src : "www/index.html",
+                dest : "dist/index.html",
+                options: {
+                    context: {
+                        ENV: "production"
+                    }
+                }
+            }
+        }
 
     });
     
     grunt.registerTask("default", [
         "sass:dev",
-        "express",
+        "express:dev",
         "open",
         "watch"
     ]);
 
     grunt.registerTask("build", [
         "sass:dist",
-        "requirejs:compile",
+        "requirejs",
     ]);
 
     grunt.registerTask("prod", [
         "build",
-        "express",
-        "open"
+        "preprocess",
+        "express:prod",
+        "open",
+        "watch:dist"
     ]);
 
 };

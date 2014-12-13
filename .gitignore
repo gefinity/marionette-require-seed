@@ -3,3 +3,5 @@ bin/
 node_modules/
 .sass-cache/
 bower_components
+dist/
+/www/css/style.css
